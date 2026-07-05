@@ -5,8 +5,10 @@ pygame.init()
 screen = pygame.display.set_mode((1280, 720))
 clock = pygame.time.Clock()
 running = True
-q_list = []
-q_dict = {}
+q_list = [
+    "Out of pokemon's 19 types, how many is it possible to be immune to at one time?"
+]
+a_list = [("medium", "19")]
 
 while running:
     for event in pygame.event.get():
