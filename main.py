@@ -14,7 +14,9 @@ q_list = [
     "'Garganacl' has an ability that makes it take half damage from which type?",
     "Despite being a water type, 'Walking Wake' prefers which weather condition?",
     "How many pokemon can set up the 'Snow' weather condition with an ability?",
-    "It is said that if an 'Onix' lives for over 100 years, its composition changes to become like what precious gem?",
+    "If an 'Onix' lives for 100 years, its composition changes to become like which precious gem?",
+    "'Gholdengo' is made of gold, though its in-game type is actually an alloy. Which alloy is this?",
+    "'Detect' always works the first time, and has a 1/3 chance to work the second time. What are the odds it works on the 8th time?",
 ]
 a_list = [
     ("medium", "19"),
@@ -22,17 +24,19 @@ a_list = [
     ("easy", "2"),
     ("medium", "poison"),
     ("hard", "protect"),
-    ("rugged", "ghost"),
+    ("enduring", "ghost"),
     ("terrifying", "sun"),
-    ("chilly", "8 or 9"),
-    ("rugged", "diamond"),
+    ("bone-chilling", "8 or 9"),
+    ("enduring", "diamond"),
+    ("pointed", "steel"),
+    ("hard", "1/729"),
 ]
 
 special_difficulty = {
-    "rugged": "regirock",
-    "chilly": "regice",
-    "sharp": "registeel",
-    "energetic": "regieleki",
+    "enduring": "regirock",
+    "bone-chilling": "regice",
+    "pointed": "registeel",
+    "shocking": "regieleki",
     "terrifying": "regidrago",
 }
 
