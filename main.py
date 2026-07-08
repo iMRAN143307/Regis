@@ -16,7 +16,9 @@ q_list = [
     "How many pokemon can set up the 'Snow' weather condition with an ability?",
     "If an 'Onix' lives for 100 years, its composition changes to become like which precious gem?",
     "'Gholdengo' is made of gold, though its in-game type is actually an alloy. Which alloy is this?",
-    "'Detect' always works the first time, and has a 1/3 chance to work the second time. What are the odds it works on the 8th time?",
+    "'Detect' always works the first time, and has a 1/3 chance to work the second time. What are the odds it works on the 3rd time?",
+    "What was the first ever pure flying type pokemon introduced in Pokemon GO?",
+    "'Rotom' in its Washing Machine form has two weaknesses. By levitating in the air, it gets rid of which weakness?",
 ]
 a_list = [
     ("medium", "19"),
@@ -26,10 +28,12 @@ a_list = [
     ("hard", "protect"),
     ("enduring", "ghost"),
     ("terrifying", "sun"),
-    ("bone-chilling", "8 or 9"),
+    ("bone-chilling", "8 or 9, depending on the counting"),
     ("enduring", "diamond"),
     ("pointed", "steel"),
-    ("hard", "1/729"),
+    ("easy", "1/9"),
+    ("hard", "tornadus"),
+    ("shocking", "ground"),
 ]
 
 special_difficulty = {
