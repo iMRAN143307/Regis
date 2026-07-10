@@ -23,6 +23,9 @@ q_list = [
     "The legendary pokemon 'Landorus-Therian' has an ability that weakens opponents whenever it hits the field. What is this ability called?",
     "The transport pokemon 'Lapras', when in its Gigantamax form, is said to be able to carry how many thousands of people?",
     "Instead of a Mega Stone, 'Rayquaza' uses a cosmic object to mega evolve. What cosmic object is this?",
+    "'Dedenne' cannot generate much electricity because its organs are not fully developed. What does it do when it is low on electricity?",
+    "Because it has an incredibly powerful ability, 'Shedinja' has which base stat reduced to just 1?",
+    "A pokemon has a Base Stat Total of 480, and each of its 6 base stats is equal to the others. What number does it have in each base stat?"
 ]
 a_list = [
     ("medium", "19"),
@@ -42,6 +45,9 @@ a_list = [
     ("hard", "intimidate"),
     ("bone-chilling", "5"),
     ("terrifying", "meteorite"),
+    ("shocking", "sleep"),
+    ("medium", "health or hp"),
+    ("easy", "80")
 ]
 
 special_difficulty = {
