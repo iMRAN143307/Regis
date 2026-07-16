@@ -1,10 +1,10 @@
-import pygame
+#import pygame
 
-pygame.mixer.pre_init(44100, -16, 2, 4096)
-pygame.init()
-screen = pygame.display.set_mode((1280, 720))
-clock = pygame.time.Clock()
-running = True
+#pygame.mixer.pre_init(44100, -16, 2, 4096)
+#pygame.init()
+#screen = pygame.display.set_mode((1280, 720))
+#clock = pygame.time.Clock()
+#running = True
 q_list = [
     "Out of pokemon's 19 types, how many is it possible to be immune to at one time?",
     "What is the highest base Speed stat of any pokemon?",
@@ -25,7 +25,11 @@ q_list = [
     "Instead of a Mega Stone, 'Rayquaza' uses a cosmic object to mega evolve. What cosmic object is this?",
     "'Dedenne' cannot generate much electricity because its organs are not fully developed. What does it do when it is low on electricity?",
     "Because it has an incredibly powerful ability, 'Shedinja' has which base stat reduced to just 1?",
-    "A pokemon has a Base Stat Total of 480, and each of its 6 base stats is equal to the others. What number does it have in each base stat?"
+    "A pokemon has a Base Stat Total of 480, and each of its 6 base stats is equal to the others. What number does it have in each base stat?",
+    "The status move 'Spore' will put any pokemon to sleep except for grass types and those wearing which item?",
+    "The first time you challenge Gym Leader 'Korrina' in pokemon X and Y, she does not use a full team of 6, instead using how many pokemon?",
+    "Name one of the two pokemon types first introduced in pokemon Gold and Silver.",
+    "Out of pokemon's 19 types, how many pokemon types exist in the pokemon Trading Card Game?"
 ]
 a_list = [
     ("medium", "19"),
@@ -47,7 +51,11 @@ a_list = [
     ("terrifying", "meteorite"),
     ("shocking", "sleep"),
     ("medium", "health or hp"),
-    ("easy", "80")
+    ("easy", "80"),
+    ("hard", "safety goggles"),
+    ("easy", "2"),
+    ("medium", "dark or steel"),
+    ("medium", "11")
 ]
 
 special_difficulty = {
@@ -58,11 +66,11 @@ special_difficulty = {
     "terrifying": "regidrago",
 }
 
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-
-    pygame.display.flip()
-
-pygame.quit()
+#while running:
+#    for event in pygame.event.get():
+#        if event.type == pygame.QUIT:
+#            running = False
+#
+#    pygame.display.flip()
+#
+#pygame.quit()
