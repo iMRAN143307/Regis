@@ -16,7 +16,11 @@ fontObj = pygame.font.Font(None, 30)
 mode = "question"
 team1_points = [0, 0, 0, 0, 0, 0]
 team2_points = [0, 0, 0, 0, 0, 0]
+point_allocation_rects = [(72, 580, 144, 144), (360, 580, 144, 144), (648, 580, 144, 144), (936, 580, 144, 144), (1224, 580, 144, 144), (648, 180, 144, 144)]
 key_cooldown = 240
+clickx = None
+clicky = None
+team_answering = 1
 
 q_list = [
     "Out of pokemon's 19 types, how many is it possible to be immune to at one time?",
@@ -72,11 +76,11 @@ a_list = [
 ]
 
 special_difficulty = {
-    "enduring": "regirock",
-    "bone-chilling": "regice",
-    "pointed": "registeel",
-    "shocking": "regieleki",
-    "terrifying": "regidrago",
+    "enduring": 0,
+    "bone-chilling": 1,
+    "pointed": 2,
+    "shocking": 3,
+    "terrifying": 4,
 }
 
 current_num = random.randint(0, len(q_list) - 1)
@@ -97,18 +101,30 @@ while running:
                 while current_num in used_nums:
                     current_num = random.randint(0, len(q_list) - 1)
                 mode = "question"
+            if team_answering == 1:
+                team_answering = 2
+            else:
+                team_answering = 1
         if event.type == CORRECT:
             mode = "point_allocation"
         if event.type == DONE_POINT_ALLOCATION:
             used_nums.add(current_num)
             if len(used_nums) == len(q_list):
                 pygame.event.post(pygame.event.Event(GAME_END))
-            current_num = random.randint(0, len(q_list) - 1)
-            while current_num in used_nums:
+            else:
                 current_num = random.randint(0, len(q_list) - 1)
-            mode = "question"
+                while current_num in used_nums:
+                    current_num = random.randint(0, len(q_list) - 1)
+                mode = "question"
+            if team_answering == 1:
+                team_answering = 2
+            else:
+                team_answering = 1
         if event.type == GAME_END:
             running = False
+        if event.type == pygame.MOUSEBUTTONDOWN and key_cooldown == 0:
+            key_cooldown = 240
+            clickx, clicky = event.pos
 
     if key_cooldown != 0:
         key_cooldown -= 1
@@ -120,6 +136,9 @@ while running:
         if keys[pygame.K_RETURN]:
             key_cooldown = 240
             pygame.event.post(pygame.event.Event(CHECK_ANSWER))
+        if keys[pygame.K_ESCAPE]:
+            key_cooldown = 240
+            pygame.event.post(pygame.event.Event(CORRECT))
 
     if mode == "question":
         screen.fill("black")
@@ -131,7 +150,35 @@ while running:
         screen.blit(fontObj.render(a_list[current_num][0], True, (255, 255, 255), None), (10, 10))
 
     elif mode == "point_allocation":
+
+        points = 0
+        if a_list[current_num][0] == "easy":
+            points = 10
+        elif a_list[current_num][0] == "medium":
+            points = 20
+        elif a_list[current_num][0] == "hard":
+            points = 30
+
+        if clickx is not None and clicky is not None:
+            for rect in point_allocation_rects:
+                if clickx > rect[0] and clickx < rect[0] + rect[2] and clicky > rect[1] and clicky < rect[1] + rect[3]:
+                    clickx = None
+                    clicky = None
+                    if team_answering == 1:
+                        team1_points[point_allocation_rects.index(rect)] += points
+                    else:
+                        team2_points[point_allocation_rects.index(rect)] += points
+                    print(team1_points)
+                    print(team2_points)
+                    break
+
         screen.fill("black")
+        pygame.draw.rect(screen, "white", point_allocation_rects[0])
+        pygame.draw.rect(screen, "white", point_allocation_rects[1])
+        pygame.draw.rect(screen, "white", point_allocation_rects[2])
+        pygame.draw.rect(screen, "white", point_allocation_rects[3])
+        pygame.draw.rect(screen, "white", point_allocation_rects[4])
+        pygame.draw.rect(screen, "white", point_allocation_rects[5])
 
     pygame.display.flip()
 
