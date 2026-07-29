@@ -1,10 +1,23 @@
-#import pygame
+import pygame
+import random
 
-#pygame.mixer.pre_init(44100, -16, 2, 4096)
-#pygame.init()
-#screen = pygame.display.set_mode((1280, 720))
-#clock = pygame.time.Clock()
-#running = True
+SONG_END = pygame.USEREVENT + 1
+CHECK_ANSWER = pygame.USEREVENT + 2
+INCORRECT = pygame.USEREVENT + 3
+CORRECT = pygame.USEREVENT + 4
+DONE_POINT_ALLOCATION = pygame.USEREVENT + 5
+GAME_END = pygame.USEREVENT + 6
+
+pygame.mixer.pre_init(44100, -16, 2, 4096)
+pygame.init()
+screen = pygame.display.set_mode((1440, 960))
+running = True
+fontObj = pygame.font.Font(None, 30)
+mode = "question"
+team1_points = [0, 0, 0, 0, 0, 0]
+team2_points = [0, 0, 0, 0, 0, 0]
+key_cooldown = 240
+
 q_list = [
     "Out of pokemon's 19 types, how many is it possible to be immune to at one time?",
     "What is the highest base Speed stat of any pokemon?",
@@ -66,11 +79,60 @@ special_difficulty = {
     "terrifying": "regidrago",
 }
 
-#while running:
-#    for event in pygame.event.get():
-#        if event.type == pygame.QUIT:
-#            running = False
-#
-#    pygame.display.flip()
-#
-#pygame.quit()
+current_num = random.randint(0, len(q_list) - 1)
+used_nums = set()
+
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        if event.type == CHECK_ANSWER:
+            mode = "answer_checking"
+        if event.type == INCORRECT:
+            used_nums.add(current_num)
+            if len(used_nums) == len(q_list):
+                pygame.event.post(pygame.event.Event(GAME_END))
+            else:
+                current_num = random.randint(0, len(q_list) - 1)
+                while current_num in used_nums:
+                    current_num = random.randint(0, len(q_list) - 1)
+                mode = "question"
+        if event.type == CORRECT:
+            mode = "point_allocation"
+        if event.type == DONE_POINT_ALLOCATION:
+            used_nums.add(current_num)
+            if len(used_nums) == len(q_list):
+                pygame.event.post(pygame.event.Event(GAME_END))
+            current_num = random.randint(0, len(q_list) - 1)
+            while current_num in used_nums:
+                current_num = random.randint(0, len(q_list) - 1)
+            mode = "question"
+        if event.type == GAME_END:
+            running = False
+
+    if key_cooldown != 0:
+        key_cooldown -= 1
+    else:
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_SPACE]:
+            key_cooldown = 240
+            pygame.event.post(pygame.event.Event(INCORRECT))
+        if keys[pygame.K_RETURN]:
+            key_cooldown = 240
+            pygame.event.post(pygame.event.Event(CHECK_ANSWER))
+
+    if mode == "question":
+        screen.fill("black")
+        screen.blit(fontObj.render(q_list[current_num], True, (255, 255, 255), None), (10, 10))
+
+    elif mode == "answer_checking":
+        screen.fill("black")
+        screen.blit(fontObj.render(a_list[current_num][1], True, (255, 255, 255), None), (640, 10))
+        screen.blit(fontObj.render(a_list[current_num][0], True, (255, 255, 255), None), (10, 10))
+
+    elif mode == "point_allocation":
+        screen.fill("black")
+
+    pygame.display.flip()
+
+pygame.quit()
