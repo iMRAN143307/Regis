@@ -1,5 +1,7 @@
 import pygame
 import random
+import sys
+import os
 
 SONG_END = pygame.USEREVENT + 1
 CHECK_ANSWER = pygame.USEREVENT + 2
@@ -86,6 +88,27 @@ special_difficulty = {
 current_num = random.randint(0, len(q_list) - 1)
 used_nums = set()
 
+def resource_path(relative_path):
+    try:
+        base_path = sys.MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+
+def load_and_scale(filename, size, transparency=None):
+    if transparency == None:
+        unscaled = pygame.image.load(resource_path(f"{filename}.png")).convert()
+    else:
+        unscaled = pygame.image.load(resource_path(f"{filename}.png")).convert_alpha()
+    return pygame.transform.scale(unscaled, size)
+
+regirock = load_and_scale("regirock", (144, 144))
+regice = load_and_scale("regice", (144, 144))
+registeel = load_and_scale("registeel", (144, 144))
+regieleki = load_and_scale("regieleki", (144, 144))
+regidrago = load_and_scale("regidrago", (144, 144))
+regigigas = load_and_scale("regigigas", (144, 144))
+
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -121,7 +144,7 @@ while running:
             else:
                 team_answering = 1
         if event.type == GAME_END:
-            running = False
+            mode = "celebration"
         if event.type == pygame.MOUSEBUTTONDOWN and key_cooldown == 0:
             key_cooldown = 240
             clickx, clicky = event.pos
@@ -151,6 +174,14 @@ while running:
 
     elif mode == "point_allocation":
 
+        screen.fill("black")
+        screen.blit(regirock, point_allocation_rects[0])
+        screen.blit(regice, point_allocation_rects[1])
+        screen.blit(registeel, point_allocation_rects[2])
+        screen.blit(regieleki, point_allocation_rects[3])
+        screen.blit(regidrago, point_allocation_rects[4])
+        screen.blit(regigigas, point_allocation_rects[5])
+
         points = 0
         if a_list[current_num][0] == "easy":
             points = 10
@@ -159,26 +190,27 @@ while running:
         elif a_list[current_num][0] == "hard":
             points = 30
 
-        if clickx is not None and clicky is not None:
-            for rect in point_allocation_rects:
+        for rect in point_allocation_rects:
+            if team1_points[point_allocation_rects.index(rect)] >= 60 or team2_points[point_allocation_rects.index(rect)] >= 60:
+                rect_surface = pygame.Surface((144, 144))
+                rect_surface.set_alpha(128)
+                rect_surface.fill((0, 0, 0))
+                screen.blit(rect_surface, rect)
+            elif clickx is not None and clicky is not None:
                 if clickx > rect[0] and clickx < rect[0] + rect[2] and clicky > rect[1] and clicky < rect[1] + rect[3]:
                     clickx = None
                     clicky = None
                     if team_answering == 1:
                         team1_points[point_allocation_rects.index(rect)] += points
+                        print(team1_points)
                     else:
                         team2_points[point_allocation_rects.index(rect)] += points
-                    print(team1_points)
-                    print(team2_points)
+                        print(team2_points)
                     break
 
+    elif mode == "celebration":
         screen.fill("black")
-        pygame.draw.rect(screen, "white", point_allocation_rects[0])
-        pygame.draw.rect(screen, "white", point_allocation_rects[1])
-        pygame.draw.rect(screen, "white", point_allocation_rects[2])
-        pygame.draw.rect(screen, "white", point_allocation_rects[3])
-        pygame.draw.rect(screen, "white", point_allocation_rects[4])
-        pygame.draw.rect(screen, "white", point_allocation_rects[5])
+        screen.blit(fontObj.render("Congratulations", True, (255, 255, 255), None), (10, 10))
 
     pygame.display.flip()
 
