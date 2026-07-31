@@ -9,6 +9,8 @@ INCORRECT = pygame.USEREVENT + 3
 CORRECT = pygame.USEREVENT + 4
 DONE_POINT_ALLOCATION = pygame.USEREVENT + 5
 GAME_END = pygame.USEREVENT + 6
+TEAM1_WIN = pygame.USEREVENT + 7
+TEAM2_WIN = pygame.USEREVENT + 8
 
 pygame.mixer.pre_init(44100, -16, 2, 4096)
 pygame.init()
@@ -23,6 +25,8 @@ key_cooldown = 240
 clickx = None
 clicky = None
 team_answering = 1
+team1_regis = []
+team2_regis = []
 
 q_list = [
     "Out of pokemon's 19 types, how many is it possible to be immune to at one time?",
@@ -109,6 +113,8 @@ regieleki = load_and_scale("regieleki", (144, 144))
 regidrago = load_and_scale("regidrago", (144, 144))
 regigigas = load_and_scale("regigigas", (144, 144))
 
+regi_list = [regirock, regice, registeel, regieleki, regidrago, regigigas]
+
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -132,7 +138,11 @@ while running:
             mode = "point_allocation"
         if event.type == DONE_POINT_ALLOCATION:
             used_nums.add(current_num)
-            if len(used_nums) == len(q_list):
+            if team1_points[5] >= 60:
+                pygame.event.post(pygame.event.Event(TEAM1_WIN))
+            elif team2_points[5] >= 60:
+                pygame.event.post(pygame.event.Event(TEAM2_WIN))
+            elif(used_nums) == len(q_list):
                 pygame.event.post(pygame.event.Event(GAME_END))
             else:
                 current_num = random.randint(0, len(q_list) - 1)
@@ -144,7 +154,12 @@ while running:
             else:
                 team_answering = 1
         if event.type == GAME_END:
-            mode = "celebration"
+            pass
+            #break ties
+        if event.type == TEAM1_WIN:
+            mode = "t1celebration"
+        if event.type == TEAM2_WIN:
+            mode = "t2celebration"
         if event.type == pygame.MOUSEBUTTONDOWN and key_cooldown == 0:
             key_cooldown = 240
             clickx, clicky = event.pos
@@ -191,7 +206,7 @@ while running:
             points = 30
 
         for rect in point_allocation_rects:
-            if team1_points[point_allocation_rects.index(rect)] >= 60 or team2_points[point_allocation_rects.index(rect)] >= 60:
+            if team1_points[point_allocation_rects.index(rect)] >= 60 or team2_points[point_allocation_rects.index(rect)] >= 60 or (rect == point_allocation_rects[-1] and eval(f"team{team_answering}_regis") == []):
                 rect_surface = pygame.Surface((144, 144))
                 rect_surface.set_alpha(128)
                 rect_surface.fill((0, 0, 0))
@@ -202,15 +217,28 @@ while running:
                     clicky = None
                     if team_answering == 1:
                         team1_points[point_allocation_rects.index(rect)] += points
-                        print(team1_points)
+                        for i, potential_regi in enumerate(team1_points):
+                            potential_regi_image = regi_list[i]
+                            if potential_regi >= 60 and not (potential_regi_image  in team1_regis):
+                                team1_regis.append(potential_regi_image)
+                        print(f"team 1 points: {team1_points}, {team1_regis}")
                     else:
                         team2_points[point_allocation_rects.index(rect)] += points
-                        print(team2_points)
+                        for i, potential_regi in enumerate(team2_points):
+                            potential_regi_image = regi_list[i]
+                            if potential_regi >= 60 and not (potential_regi_image  in team2_regis):
+                                team2_regis.append(potential_regi_image)
+                        print(f"team 2 points: {team2_points}, {team2_regis}")
+                    pygame.event.post(pygame.event.Event(DONE_POINT_ALLOCATION))
                     break
 
-    elif mode == "celebration":
+    elif mode == "t1celebration":
         screen.fill("black")
-        screen.blit(fontObj.render("Congratulations", True, (255, 255, 255), None), (10, 10))
+        screen.blit(fontObj.render("Congratulations Team 1", True, (255, 255, 255), None), (10, 10))
+
+    elif mode == "t2celebration":
+        screen.fill("black")
+        screen.blit(fontObj.render("Congratulations Team 2", True, (255, 255, 255), None), (10, 10))
 
     pygame.display.flip()
 
