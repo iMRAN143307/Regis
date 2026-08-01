@@ -119,6 +119,7 @@ regidrago = load_and_scale("regidrago", (144, 144))
 regigigas = load_and_scale("regigigas", (144, 144))
 right = load_and_scale("right")
 wrong = load_and_scale("wrong")
+check = load_and_scale("check", None, True)
 
 regi_list = [regirock, regice, registeel, regieleki, regidrago, regigigas]
 
@@ -173,15 +174,16 @@ while running:
 
     if key_cooldown != 0:
         key_cooldown -= 1
-    else:
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE]:
-            key_cooldown = 240
-            pygame.event.post(pygame.event.Event(CHECK_ANSWER))
 
     if mode == "question":
         screen.fill("black")
         screen.blit(fontObj.render(q_list[current_num], True, (255, 255, 255), None), (10, 10))
+        screen.blit(check, (564, 400))
+        if clickx is not None and clicky is not None and clickx < 876 and clickx > 564 and clicky < 544 and clicky > 400:
+                clickx = None
+                clicky = None
+                pygame.event.post(pygame.event.Event(CHECK_ANSWER))
+                #Add dramatic sound
 
     elif mode == "answer_checking":
         screen.fill("black")
@@ -248,11 +250,11 @@ while running:
 
     elif mode == "t1celebration":
         screen.fill("black")
-        screen.blit(fontObj.render("Congratulations Team 1", True, (255, 255, 255), None), (10, 10))
+        screen.blit(largeFontObj.render("Congratulations Team 1", True, (255, 255, 255), None), (10, 10))
 
     elif mode == "t2celebration":
         screen.fill("black")
-        screen.blit(fontObj.render("Congratulations Team 2", True, (255, 255, 255), None), (10, 10))
+        screen.blit(largeFontObj.render("Congratulations Team 2", True, (255, 255, 255), None), (10, 10))
 
     pygame.display.flip()
 
