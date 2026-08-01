@@ -17,6 +17,8 @@ pygame.init()
 screen = pygame.display.set_mode((1440, 960))
 running = True
 fontObj = pygame.font.Font(None, 30)
+smallFontObj = pygame.font.Font(None, 15)
+largeFontObj = pygame.font.Font(None, 70)
 mode = "question"
 team1_points = [0, 0, 0, 0, 0, 0]
 team2_points = [0, 0, 0, 0, 0, 0]
@@ -99,12 +101,15 @@ def resource_path(relative_path):
         base_path = os.path.abspath(".")
     return os.path.join(base_path, relative_path)
 
-def load_and_scale(filename, size, transparency=None):
-    if transparency == None:
+def load_and_scale(filename, size=None, transparency=None):
+    if transparency is not None:
         unscaled = pygame.image.load(resource_path(f"{filename}.png")).convert()
     else:
         unscaled = pygame.image.load(resource_path(f"{filename}.png")).convert_alpha()
-    return pygame.transform.scale(unscaled, size)
+    if size is not None:
+        return pygame.transform.scale(unscaled, size)
+    else:
+        return unscaled
 
 regirock = load_and_scale("regirock", (144, 144))
 regice = load_and_scale("regice", (144, 144))
@@ -112,6 +117,8 @@ registeel = load_and_scale("registeel", (144, 144))
 regieleki = load_and_scale("regieleki", (144, 144))
 regidrago = load_and_scale("regidrago", (144, 144))
 regigigas = load_and_scale("regigigas", (144, 144))
+right = load_and_scale("right")
+wrong = load_and_scale("wrong")
 
 regi_list = [regirock, regice, registeel, regieleki, regidrago, regigigas]
 
@@ -170,13 +177,7 @@ while running:
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE]:
             key_cooldown = 240
-            pygame.event.post(pygame.event.Event(INCORRECT))
-        if keys[pygame.K_RETURN]:
-            key_cooldown = 240
             pygame.event.post(pygame.event.Event(CHECK_ANSWER))
-        if keys[pygame.K_ESCAPE]:
-            key_cooldown = 240
-            pygame.event.post(pygame.event.Event(CORRECT))
 
     if mode == "question":
         screen.fill("black")
@@ -184,8 +185,21 @@ while running:
 
     elif mode == "answer_checking":
         screen.fill("black")
-        screen.blit(fontObj.render(a_list[current_num][1], True, (255, 255, 255), None), (640, 10))
-        screen.blit(fontObj.render(a_list[current_num][0], True, (255, 255, 255), None), (10, 10))
+        screen.blit(largeFontObj.render(a_list[current_num][1], True, (255, 255, 255), None), (500, 300))
+        screen.blit(fontObj.render(a_list[current_num][0], True, (255, 255, 255), None), (500, 400))
+        screen.blit(right, (800, 620))
+        screen.blit(wrong, (500, 620))
+        if clickx is not None and clicky is not None:
+            if clickx < 944 and clickx > 800 and clicky < 764 and clicky > 620:
+                clickx = None
+                clicky = None
+                pygame.event.post(pygame.event.Event(CORRECT))
+                #Add correct sound
+            elif clickx < 644 and clickx > 500 and clicky < 764 and clicky > 620:
+                clickx = None
+                clicky = None
+                pygame.event.post(pygame.event.Event(INCORRECT))
+                #Add incorrect sound
 
     elif mode == "point_allocation":
 
