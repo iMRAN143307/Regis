@@ -121,12 +121,24 @@ right = load_and_scale("right")
 wrong = load_and_scale("wrong")
 check = load_and_scale("check", None, True)
 
+song0 = "rr1.wav"
+song1 = "rr2.wav"
+playlist = [song0, song1]
+pygame.mixer.music.set_endevent(SONG_END)
+song_index = random.randint(0, 1)
+pygame.mixer.music.load(playlist[song_index])
+pygame.mixer.music.play()
+
 regi_list = [regirock, regice, registeel, regieleki, regidrago, regigigas]
 
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        if event.type == SONG_END:
+            song_index = (song_index + 1) % len(playlist)
+            pygame.mixer.music.load(playlist[song_index])
+            pygame.mixer.music.play()
         if event.type == CHECK_ANSWER:
             mode = "answer_checking"
         if event.type == INCORRECT:
