@@ -121,6 +121,14 @@ right = load_and_scale("right")
 wrong = load_and_scale("wrong")
 check = load_and_scale("check", None, True)
 
+answer_checking = pygame.mixer.Sound(os.path.join("answer_checking.wav"))
+congratulations = pygame.mixer.Sound(os.path.join("congratulations.wav"))
+correct = pygame.mixer.Sound(os.path.join("correct.wav"))
+incorrect = pygame.mixer.Sound(os.path.join("incorrect.wav"))
+regi_chosen = pygame.mixer.Sound(os.path.join("regi_chosen.wav"))
+regi_gained = pygame.mixer.Sound(os.path.join("regi_gained.wav"))
+congratulations_played = 0
+
 song0 = "rr1.wav"
 song1 = "rr2.wav"
 playlist = [song0, song1]
@@ -135,7 +143,7 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        if event.type == SONG_END:
+        if event.type == SONG_END and congratulations_played == 0:
             song_index = (song_index + 1) % len(playlist)
             pygame.mixer.music.load(playlist[song_index])
             pygame.mixer.music.play()
@@ -195,7 +203,7 @@ while running:
                 clickx = None
                 clicky = None
                 pygame.event.post(pygame.event.Event(CHECK_ANSWER))
-                #Add dramatic sound
+                answer_checking.play()
 
     elif mode == "answer_checking":
         screen.fill("black")
@@ -208,12 +216,12 @@ while running:
                 clickx = None
                 clicky = None
                 pygame.event.post(pygame.event.Event(CORRECT))
-                #Add correct sound
+                correct.play()
             elif clickx < 644 and clickx > 500 and clicky < 764 and clicky > 620:
                 clickx = None
                 clicky = None
                 pygame.event.post(pygame.event.Event(INCORRECT))
-                #Add incorrect sound
+                incorrect.play()
 
     elif mode == "point_allocation":
 
@@ -232,6 +240,24 @@ while running:
             points = 20
         elif a_list[current_num][0] == "hard":
             points = 30
+        else:
+            points = regi_list[special_difficulty[a_list[current_num][0]]]
+            if points in eval(f"team{team_answering}_regis"):
+                print(eval(f"team{team_answering}_regis"))
+                pygame.event.post(pygame.event.Event(eval(f"TEAM{team_answering}_WIN")))
+            else:
+                regi_gained.play()
+                if team_answering == 1:
+                    team1_regis.append(points)
+                    team1_points[special_difficulty[a_list[current_num][0]]] = 60
+                    if points in team2_regis:
+                        team2_regis.remove(points)
+                elif team_answering == 2:
+                    team2_regis.append(points)
+                    team2_points[special_difficulty[a_list[current_num][0]]] = 60
+                    if points in team1_regis:
+                        team1_regis.remove(points)
+            pygame.event.post(pygame.event.Event(DONE_POINT_ALLOCATION))
 
         for rect in point_allocation_rects:
             if team1_points[point_allocation_rects.index(rect)] >= 60 or team2_points[point_allocation_rects.index(rect)] >= 60 or (rect == point_allocation_rects[-1] and eval(f"team{team_answering}_regis") == []):
@@ -245,16 +271,24 @@ while running:
                     clicky = None
                     if team_answering == 1:
                         team1_points[point_allocation_rects.index(rect)] += points
+                        if team1_points[point_allocation_rects.index(rect)] >= 60:
+                            regi_gained.play()
+                        else:
+                            regi_chosen.play()
                         for i, potential_regi in enumerate(team1_points):
                             potential_regi_image = regi_list[i]
-                            if potential_regi >= 60 and not (potential_regi_image  in team1_regis):
+                            if potential_regi >= 60 and not (potential_regi_image in team1_regis) and not (potential_regi_image in team2_regis):
                                 team1_regis.append(potential_regi_image)
                         print(f"team 1 points: {team1_points}, {team1_regis}")
                     else:
                         team2_points[point_allocation_rects.index(rect)] += points
+                        if team2_points[point_allocation_rects.index(rect)] >= 60:
+                            regi_gained.play()
+                        else:
+                            regi_chosen.play()
                         for i, potential_regi in enumerate(team2_points):
                             potential_regi_image = regi_list[i]
-                            if potential_regi >= 60 and not (potential_regi_image  in team2_regis):
+                            if potential_regi >= 60 and not (potential_regi_image in team2_regis) and not (potential_regi_image in team1_regis):
                                 team2_regis.append(potential_regi_image)
                         print(f"team 2 points: {team2_points}, {team2_regis}")
                     pygame.event.post(pygame.event.Event(DONE_POINT_ALLOCATION))
@@ -263,10 +297,18 @@ while running:
     elif mode == "t1celebration":
         screen.fill("black")
         screen.blit(largeFontObj.render("Congratulations Team 1", True, (255, 255, 255), None), (10, 10))
+        if congratulations_played == 0:
+            pygame.mixer.music.stop()
+            congratulations.play()
+            congratulations_played = 1
 
     elif mode == "t2celebration":
         screen.fill("black")
         screen.blit(largeFontObj.render("Congratulations Team 2", True, (255, 255, 255), None), (10, 10))
+        if congratulations_played == 0:
+            pygame.mixer.music.stop()
+            congratulations.play()
+            congratulations_played = 1
 
     pygame.display.flip()
 
