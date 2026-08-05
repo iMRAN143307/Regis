@@ -1,3 +1,5 @@
+from turtle import back
+
 import pygame
 import random
 import sys
@@ -120,6 +122,8 @@ regigigas = load_and_scale("regigigas", (144, 144))
 right = load_and_scale("right")
 wrong = load_and_scale("wrong")
 check = load_and_scale("check", None, True)
+background = load_and_scale("bg")
+fire_blocker = load_and_scale("fire_blocker")
 
 answer_checking = pygame.mixer.Sound(os.path.join("answer_checking.wav"))
 congratulations = pygame.mixer.Sound(os.path.join("congratulations.wav"))
@@ -166,9 +170,9 @@ while running:
             mode = "point_allocation"
         if event.type == DONE_POINT_ALLOCATION:
             used_nums.add(current_num)
-            if team1_points[5] >= 60:
+            if team1_points[5] >= 60 or len(team1_regis) == 5:
                 pygame.event.post(pygame.event.Event(TEAM1_WIN))
-            elif team2_points[5] >= 60:
+            elif team2_points[5] >= 60 or len(team2_regis) == 5:
                 pygame.event.post(pygame.event.Event(TEAM2_WIN))
             elif(used_nums) == len(q_list):
                 pygame.event.post(pygame.event.Event(GAME_END))
@@ -182,8 +186,12 @@ while running:
             else:
                 team_answering = 1
         if event.type == GAME_END:
-            pass
-            #break ties
+            if len(team1_regis) > len(team2_regis):
+                pygame.event.post(pygame.event.Event(TEAM1_WIN))
+            elif len(team2_regis) > len(team1_regis):
+                pygame.event.post(pygame.event.Event(TEAM2_WIN))
+            else:
+                mode = "tie"
         if event.type == TEAM1_WIN:
             mode = "t1celebration"
         if event.type == TEAM2_WIN:
@@ -195,10 +203,23 @@ while running:
     if key_cooldown != 0:
         key_cooldown -= 1
 
+    screen.blit(background, (0, 0))
+
     if mode == "question":
-        screen.fill("black")
         screen.blit(fontObj.render(q_list[current_num], True, (255, 255, 255), None), (10, 10))
         screen.blit(check, (564, 400))
+        if team_answering == 1:
+            screen.blit(fontObj.render("Team 1 Regis", True, "yellow", None), (10, 680))
+            screen.blit(fontObj.render("Team 2 Regis", True, (255, 255, 255), None), (1300, 680))
+        elif team_answering == 2:
+            screen.blit(fontObj.render("Team 1 Regis", True, (255, 255, 255), None), (10, 680))
+            screen.blit(fontObj.render("Team 2 Regis", True, "yellow", None), (1300, 680))
+        if team1_regis != []:
+            for i, regi in enumerate(team1_regis):
+                screen.blit(regi, (5 + (149 * i), 750))
+        if team2_regis != []:
+            for i, regi in enumerate(team2_regis):
+                screen.blit(regi, (1291 - (149 * i), 750))
         if clickx is not None and clicky is not None and clickx < 876 and clickx > 564 and clicky < 544 and clicky > 400:
                 clickx = None
                 clicky = None
@@ -206,7 +227,7 @@ while running:
                 answer_checking.play()
 
     elif mode == "answer_checking":
-        screen.fill("black")
+        screen.blit(fire_blocker, (600, 400))
         screen.blit(largeFontObj.render(a_list[current_num][1], True, (255, 255, 255), None), (500, 300))
         screen.blit(fontObj.render(a_list[current_num][0], True, (255, 255, 255), None), (500, 400))
         screen.blit(right, (800, 620))
@@ -224,8 +245,7 @@ while running:
                 incorrect.play()
 
     elif mode == "point_allocation":
-
-        screen.fill("black")
+        screen.blit(fire_blocker, (600, 400))
         screen.blit(regirock, point_allocation_rects[0])
         screen.blit(regice, point_allocation_rects[1])
         screen.blit(registeel, point_allocation_rects[2])
@@ -242,21 +262,24 @@ while running:
             points = 30
         else:
             points = regi_list[special_difficulty[a_list[current_num][0]]]
+            print(eval(f"team{team_answering}_regis"))
             if points in eval(f"team{team_answering}_regis"):
-                print(eval(f"team{team_answering}_regis"))
                 pygame.event.post(pygame.event.Event(eval(f"TEAM{team_answering}_WIN")))
             else:
+                correct.stop()
                 regi_gained.play()
                 if team_answering == 1:
                     team1_regis.append(points)
                     team1_points[special_difficulty[a_list[current_num][0]]] = 60
                     if points in team2_regis:
                         team2_regis.remove(points)
+                        team2_points[special_difficulty[a_list[current_num][0]]] = 0
                 elif team_answering == 2:
                     team2_regis.append(points)
                     team2_points[special_difficulty[a_list[current_num][0]]] = 60
                     if points in team1_regis:
                         team1_regis.remove(points)
+                        team1_points[special_difficulty[a_list[current_num][0]]] = 0
             pygame.event.post(pygame.event.Event(DONE_POINT_ALLOCATION))
 
         for rect in point_allocation_rects:
@@ -295,16 +318,21 @@ while running:
                     break
 
     elif mode == "t1celebration":
-        screen.fill("black")
-        screen.blit(largeFontObj.render("Congratulations Team 1", True, (255, 255, 255), None), (10, 10))
+        screen.blit(largeFontObj.render("Congratulations Team 1!", True, (255, 255, 255), None), (10, 10))
         if congratulations_played == 0:
             pygame.mixer.music.stop()
             congratulations.play()
             congratulations_played = 1
 
     elif mode == "t2celebration":
-        screen.fill("black")
-        screen.blit(largeFontObj.render("Congratulations Team 2", True, (255, 255, 255), None), (10, 10))
+        screen.blit(largeFontObj.render("Congratulations Team 2!", True, (255, 255, 255), None), (10, 10))
+        if congratulations_played == 0:
+            pygame.mixer.music.stop()
+            congratulations.play()
+            congratulations_played = 1
+
+    elif mode == "tie":
+        screen.blit(largeFontObj.render("It's a Tie!", True, (255, 255, 255), None), (10, 10))
         if congratulations_played == 0:
             pygame.mixer.music.stop()
             congratulations.play()
