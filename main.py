@@ -124,6 +124,10 @@ wrong = load_and_scale("wrong")
 check = load_and_scale("check", None, True)
 background = load_and_scale("bg")
 fire_blocker = load_and_scale("fire_blocker")
+token1 = load_and_scale("token1", None, True)
+token2 = load_and_scale("token2", None, True)
+confetti = [load_and_scale("confetti_r", None, True), load_and_scale("confetti_p", None, True), load_and_scale("confetti_y", None, True), load_and_scale("confetti_b", None, True), load_and_scale("confetti_o", None, True), load_and_scale("confetti_g", None, True)]
+particles = []
 
 answer_checking = pygame.mixer.Sound(os.path.join("answer_checking.wav"))
 congratulations = pygame.mixer.Sound(os.path.join("congratulations.wav"))
@@ -282,14 +286,20 @@ while running:
                         team1_points[special_difficulty[a_list[current_num][0]]] = 0
             pygame.event.post(pygame.event.Event(DONE_POINT_ALLOCATION))
 
-        for rect in point_allocation_rects:
+        for i, rect in enumerate(point_allocation_rects):
             if team1_points[point_allocation_rects.index(rect)] >= 60 or team2_points[point_allocation_rects.index(rect)] >= 60 or (rect == point_allocation_rects[-1] and eval(f"team{team_answering}_regis") == []):
                 rect_surface = pygame.Surface((144, 144))
                 rect_surface.set_alpha(128)
                 rect_surface.fill((0, 0, 0))
                 screen.blit(rect_surface, rect)
-            elif clickx is not None and clicky is not None:
-                if clickx > rect[0] and clickx < rect[0] + rect[2] and clicky > rect[1] and clicky < rect[1] + rect[3]:
+            else:
+                if team1_points[i] > 0:
+                    for j in range(team1_points[i]//10):
+                        screen.blit(token1, (rect[0] + 14 + (32 * (j%2)), rect[1] + 24 + (36 * (j%3))))
+                if team2_points[i] > 0:
+                    for j in range(team2_points[i]//10):
+                        screen.blit(token2, (rect[0] + 78 + (32 * (j%2)), rect[1] + 24 + (36 * (j%3))))
+                if clickx is not None and clicky is not None and clickx > rect[0] and clickx < rect[0] + rect[2] and clicky > rect[1] and clicky < rect[1] + rect[3]:
                     clickx = None
                     clicky = None
                     if team_answering == 1:
@@ -298,8 +308,8 @@ while running:
                             regi_gained.play()
                         else:
                             regi_chosen.play()
-                        for i, potential_regi in enumerate(team1_points):
-                            potential_regi_image = regi_list[i]
+                        for j, potential_regi in enumerate(team1_points):
+                            potential_regi_image = regi_list[j]
                             if potential_regi >= 60 and not (potential_regi_image in team1_regis) and not (potential_regi_image in team2_regis):
                                 team1_regis.append(potential_regi_image)
                         print(f"team 1 points: {team1_points}, {team1_regis}")
@@ -309,8 +319,8 @@ while running:
                             regi_gained.play()
                         else:
                             regi_chosen.play()
-                        for i, potential_regi in enumerate(team2_points):
-                            potential_regi_image = regi_list[i]
+                        for j, potential_regi in enumerate(team2_points):
+                            potential_regi_image = regi_list[j]
                             if potential_regi >= 60 and not (potential_regi_image in team2_regis) and not (potential_regi_image in team1_regis):
                                 team2_regis.append(potential_regi_image)
                         print(f"team 2 points: {team2_points}, {team2_regis}")
